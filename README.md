@@ -65,9 +65,9 @@ docs/           Requirements and other project documentation
 
 ## Branching Model
 
-* `main` is used for the version submitted for grading at each unit milestone.
-* `develop` is used to integrate completed work before the next milestone.
-* `feature/*` branches are used for individual development tasks. They are merged into `develop` and deleted after the work is completed.
+* `main` reflects the state submitted for grading at each unit milestone.
+* `develop` integrates completed work ahead of the next milestone.
+* `feature/*` branches are short-lived branches for one piece of work. They are merged into `develop` and deleted once the work is complete.
 
 Commit messages follow the Conventional Commits format:
 
