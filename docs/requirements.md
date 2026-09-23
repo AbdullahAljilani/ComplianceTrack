@@ -1,42 +1,39 @@
-# ComplianceTrack — Functional and Non-Functional Requirements
+# ComplianceTrack: Functional and Non-Functional Requirements
 
-Drafted in Unit 3 (Detailed Design). These are design requirements; none is
-implemented or tested yet.
+Drafted in Unit 3 (Detailed Design). These requirements describe the planned system. They have not been implemented or tested yet.
 
 ## Functional Requirements
 
-1. Authenticated GRC Administrators or Control Owners can record and update
-   the implementation status of an assigned ECC-2:2024 control.
-2. Evidence Custodians or Control Owners can upload supporting evidence for
-   a control and record its descriptive metadata.
-3. Prior evidence versions are retained, never overwritten, when a new file
-   is submitted for the same control.
-4. An assigned reviewer must approve evidence before a control can be
-   marked "Implemented."
-5. Authorized users can record a remediation finding and assign an owner, a
-   priority, and a due date.
-6. A remediation item is automatically identified as overdue once its due
-   date has passed and its status is not "Closed."
-7. Closing a remediation item requires reviewer approval distinct from the
-   item's owner.
-8. The system generates a role-dependent dashboard summarizing control
-   status, missing evidence, and overdue remediation by domain.
-9. Each user's visible functions and data are restricted to those permitted
-   by their assigned role.
-10. Every create, update, or status-change action on a control, evidence
-    record, or remediation item is written to the audit log.
+1. GRC Administrators and Control Owners can record and update the implementation status of the ECC-2:2024 controls assigned to them.
+
+2. Evidence Custodians and Control Owners can upload supporting evidence for a control and enter the related information about the evidence.
+
+3. The system keeps previous versions of evidence when a new file is uploaded for the same control. Existing evidence is not overwritten.
+
+4. A reviewer must approve the submitted evidence before a control can be marked as "Implemented."
+
+5. Authorized users can create a remediation finding and assign an owner, priority, and due date.
+
+6. The system identifies a remediation item as overdue when its due date has passed and its status is not "Closed."
+
+7. A reviewer who is not the remediation item's owner must approve the item before it can be closed.
+
+8. The system provides a dashboard based on the user's role. The dashboard shows control status, missing evidence, and overdue remediation items by domain.
+
+9. Users can only access the functions and data allowed by their assigned role.
+
+10. The system records create, update, and status-change actions for controls, evidence records, and remediation items in an audit log.
 
 ## Non-Functional Requirements
 
-- **Security** — Argon2id password hashing; HTTPS/TLS for all client-server
-  communication; no credentials or secrets committed to this repository.
-- **Usability** — core workflows are completable by a first-time authorized
-  user without external training material.
-- **Reliability** — a failed evidence upload never leaves a partially
-  recorded or orphaned database record.
-- **Scalability** — the relational data model accommodates the remaining
-  ECC-2:2024 domains without a schema redesign.
-- **Performance** — dashboard summary queries return within an
-  interactively acceptable time for the prototype's expected dataset size.
-- **Maintainability** — application code is organized by module, with full
-  history retained in Git.
+* **Security:** Passwords will be protected using Argon2id hashing. All client-server communication will use HTTPS/TLS. Credentials and other secrets will not be stored in the repository.
+
+* **Usability:** An authorized user who is using the system for the first time should be able to complete the main workflows without needing separate training material.
+
+* **Reliability:** If an evidence upload fails, the system should not leave an incomplete database record or an orphaned record.
+
+* **Scalability:** The database structure should allow the remaining ECC-2:2024 domains to be added without redesigning the database schema.
+
+* **Performance:** Dashboard summary queries should return within an acceptable response time for the expected dataset size of the prototype.
+
+* **Maintainability:** The application will be organized into separate modules, and changes will be tracked through Git.
