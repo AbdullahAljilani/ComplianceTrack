@@ -1,0 +1,56 @@
+digraph ComplianceTrackArchitecture {
+  graph [fontname="Liberation Sans", fontsize=20, label="ComplianceTrack — Proposed Layered System Architecture", labelloc=t, labeljust=c, fontcolor="#1F2933", pad=0.4, nodesep=0.35, ranksep=0.55, bgcolor="white"];
+  node [fontname="Liberation Sans", fontsize=12, shape=box, style="rounded,filled", color="#3E4C59", fontcolor="#1F2933", penwidth=1.2];
+  edge [fontname="Liberation Sans", fontsize=10.5, color="#616E7C", fontcolor="#3E4C59", penwidth=1.1];
+
+  subgraph cluster_client {
+    label="Presentation Layer"; fontsize=13; fontcolor="#1F2933"; style="rounded"; color="#9AA5B1"; bgcolor="#F5F7FA";
+    client [label="Web Browser\n(HTML5 / CSS3 / Bootstrap UI)", fillcolor="#D9E8FC"];
+  }
+
+  subgraph cluster_app {
+    label="Application Layer (Flask, HTTPS)"; fontsize=13; fontcolor="#1F2933"; style="rounded"; color="#9AA5B1"; bgcolor="#F5F7FA";
+    m1 [label="Control Register\nModule", fillcolor="#DCEFE1"];
+    m2 [label="Evidence Management\nModule", fillcolor="#DCEFE1"];
+    m3 [label="Remediation Tracker\nModule", fillcolor="#DCEFE1"];
+    m4 [label="Reporting Dashboard\nModule", fillcolor="#DCEFE1"];
+  }
+
+  subgraph cluster_shared {
+    label="Shared Cross-Cutting Services"; fontsize=13; fontcolor="#1F2933"; style="rounded"; color="#9AA5B1"; bgcolor="#F5F7FA";
+    auth [label="Authentication &\nAuthorization Service\n(RBAC, Argon2id, sessions)", fillcolor="#FCE8D5"];
+    audit [label="Audit Logging\nService\n(append-only)", fillcolor="#FCE8D5"];
+  }
+
+  subgraph cluster_data {
+    label="Data Layer"; fontsize=13; fontcolor="#1F2933"; style="rounded"; color="#9AA5B1"; bgcolor="#F5F7FA";
+    db [label="PostgreSQL 16\nControls · Evidence metadata\nRemediation · Users/Roles · Audit log", shape=cylinder, fillcolor="#F5DCE5", style=filled];
+    fs [label="Protected File Storage\n(evidence files, outside web root)", shape=folder, fillcolor="#F5DCE5", style=filled];
+  }
+
+  ecc [label="NCA ECC-2:2024\nControl Library\n(reference dataset)", shape=note, fillcolor="#FCF6D9", style=filled];
+
+  client -> m1 [label="HTTPS"];
+  client -> m2 [label="HTTPS"];
+  client -> m3 [label="HTTPS"];
+  client -> m4 [label="HTTPS"];
+
+  m1 -> auth [dir=both, style=dashed];
+  m2 -> auth [dir=both, style=dashed];
+  m3 -> auth [dir=both, style=dashed];
+  m4 -> auth [dir=both, style=dashed];
+
+  m1 -> audit [style=dashed];
+  m2 -> audit [style=dashed];
+  m3 -> audit [style=dashed];
+
+  m1 -> db;
+  m3 -> db;
+  m4 -> db [label="read-only\nqueries"];
+  m2 -> db [label="metadata"];
+  m2 -> fs [label="file I/O"];
+  auth -> db;
+  audit -> db;
+
+  ecc -> m1 [label="control taxonomy\n(seed / reference)", style=dotted];
+}

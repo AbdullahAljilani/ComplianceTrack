@@ -1,0 +1,80 @@
+digraph ComplianceTrackERD {
+  graph [fontname="Liberation Sans", fontsize=20, label="ComplianceTrack — Core Data Model (Entity-Relationship Diagram)", labelloc=t, labeljust=c, fontcolor="#1F2933", pad=0.4, nodesep=0.5, ranksep=0.65, rankdir=LR, bgcolor="white"];
+  node [fontname="Liberation Sans", fontsize=11, shape=plaintext];
+  edge [fontname="Liberation Sans", fontsize=10, color="#616E7C", fontcolor="#3E4C59", penwidth=1.1, arrowhead=crow, arrowtail=none];
+
+  roles [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#F5F7FA" color="#9AA5B1">
+      <tr><td bgcolor="#3E4C59"><font color="white"><b>roles</b></font></td></tr>
+      <tr><td align="left"><u>role_id</u> (PK)</td></tr>
+      <tr><td align="left">role_name</td></tr>
+      <tr><td align="left">description</td></tr>
+    </table>>];
+
+  users [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#F5F7FA" color="#9AA5B1">
+      <tr><td bgcolor="#3E4C59"><font color="white"><b>users</b></font></td></tr>
+      <tr><td align="left"><u>user_id</u> (PK)</td></tr>
+      <tr><td align="left">username</td></tr>
+      <tr><td align="left">password_hash</td></tr>
+      <tr><td align="left">full_name</td></tr>
+      <tr><td align="left">role_id (FK &#8594; roles)</td></tr>
+      <tr><td align="left">is_active</td></tr>
+    </table>>];
+
+  controls [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#F5F7FA" color="#9AA5B1">
+      <tr><td bgcolor="#3E4C59"><font color="white"><b>controls</b></font></td></tr>
+      <tr><td align="left"><u>control_id</u> (PK)</td></tr>
+      <tr><td align="left">ecc_reference (e.g. 1-1-1)</td></tr>
+      <tr><td align="left">domain / subdomain</td></tr>
+      <tr><td align="left">description</td></tr>
+      <tr><td align="left">owner_user_id (FK &#8594; users)</td></tr>
+      <tr><td align="left">status</td></tr>
+      <tr><td align="left">review_date</td></tr>
+    </table>>];
+
+  evidence [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#F5F7FA" color="#9AA5B1">
+      <tr><td bgcolor="#3E4C59"><font color="white"><b>evidence</b></font></td></tr>
+      <tr><td align="left"><u>evidence_id</u> (PK)</td></tr>
+      <tr><td align="left">control_id (FK &#8594; controls)</td></tr>
+      <tr><td align="left">uploaded_by (FK &#8594; users)</td></tr>
+      <tr><td align="left">file_name / storage_path</td></tr>
+      <tr><td align="left">sha256_hash</td></tr>
+      <tr><td align="left">version_no</td></tr>
+      <tr><td align="left">status</td></tr>
+      <tr><td align="left">uploaded_at</td></tr>
+    </table>>];
+
+  remediation [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#F5F7FA" color="#9AA5B1">
+      <tr><td bgcolor="#3E4C59"><font color="white"><b>remediation_items</b></font></td></tr>
+      <tr><td align="left"><u>remediation_id</u> (PK)</td></tr>
+      <tr><td align="left">control_id (FK &#8594; controls)</td></tr>
+      <tr><td align="left">finding</td></tr>
+      <tr><td align="left">owner_user_id (FK &#8594; users)</td></tr>
+      <tr><td align="left">priority / due_date</td></tr>
+      <tr><td align="left">status</td></tr>
+      <tr><td align="left">closed_by (FK &#8594; users)</td></tr>
+    </table>>];
+
+  audit [label=<
+    <table border="1" cellborder="0" cellspacing="0" cellpadding="5" bgcolor="#F5F7FA" color="#9AA5B1">
+      <tr><td bgcolor="#3E4C59"><font color="white"><b>audit_log</b></font></td></tr>
+      <tr><td align="left"><u>audit_id</u> (PK)</td></tr>
+      <tr><td align="left">user_id (FK &#8594; users)</td></tr>
+      <tr><td align="left">action</td></tr>
+      <tr><td align="left">entity_type / entity_id</td></tr>
+      <tr><td align="left">occurred_at</td></tr>
+      <tr><td align="left">details</td></tr>
+    </table>>];
+
+  roles -> users [taillabel="1", headlabel="M"];
+  users -> controls [taillabel="1", headlabel="M", label="  owns"];
+  controls -> evidence [taillabel="1", headlabel="M"];
+  controls -> remediation [taillabel="1", headlabel="M"];
+  users -> evidence [taillabel="1", headlabel="M", label="  uploads"];
+  users -> remediation [taillabel="1", headlabel="M", label="  is assigned"];
+  users -> audit [taillabel="1", headlabel="M", label="  performs"];
+}
