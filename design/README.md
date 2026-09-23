@@ -1,10 +1,13 @@
 # design/
 
-- `architecture.dot` / `architecture.png` — layered system architecture
-  (presentation, application/module, shared services, data layers).
-- `erd.dot` / `erd.png` — entity-relationship diagram for the core schema in
-  `database/schema.sql`.
+* `architecture.dot` / `architecture.png`
+  Layered system architecture showing the presentation, application/module, shared services, and data layers.
 
-Diagrams are generated with Graphviz (`dot -Tpng architecture.dot -o
-architecture.png`) so they stay reproducible from source rather than being
-hand-edited images.
+* `erd.dot` / `erd.png`
+  Entity-relationship diagram for the core database schema in `database/schema.sql`.
+
+The diagrams are generated using Graphviz:
+
+`dot -Tpng architecture.dot -o architecture.png`
+
+This allows the diagrams to be regenerated from the source files when changes are made.
