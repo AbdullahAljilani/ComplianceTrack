@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Not permitted &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<h1>Access denied</h1>
+<p class="sub">Your role does not include this function.</p>
+<div class="card">
+  <p>Signed in as <b>{{ current_user.full_name }}</b> ({{ current_user.role }}).
+  This action requires the <code>{{ needed }}</code> permission.</p>
+  <p class="muted">Authorisation is checked on the server for every request, so a
+  function that is hidden from the menu is also refused if its address is requested directly.</p>
+  <p><a class="btn ghost" href="{{ url_for('dashboard.index') }}">Back to dashboard</a></p>
+</div>
+{% endblock %}

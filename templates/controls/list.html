@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Control Register &middot; ComplianceTrack{% endblock %}
+
+{% macro status_badge(s) -%}
+  {%- if s == 'Implemented' -%}<span class="badge b-ok">{{ s }}</span>
+  {%- elif s == 'Partially Implemented' -%}<span class="badge b-warn">{{ s }}</span>
+  {%- elif s in ('Not Implemented', 'Evidence Missing') -%}<span class="badge b-bad">{{ s }}</span>
+  {%- elif s == 'Not Yet In Scope' -%}<span class="badge b-na">{{ s }}</span>
+  {%- else -%}<span class="badge b-info">{{ s }}</span>{%- endif -%}
+{%- endmacro %}
+
+{% block content %}
+<h1>Control Register</h1>
+<p class="sub">NCA ECC-2:2024 main controls. {{ total }} record{{ '' if total == 1 else 's' }} match the current filter.</p>
+
+{% if filters.tier == 'catalog_only' %}
+<div class="notice">
+  These entries are listed from the official control catalogue for framework
+  completeness. They are not tracked, evidenced or assessed by this prototype,
+  and their status is fixed at <b>Not Yet In Scope</b>.
+</div>
+{% endif %}
+
+<div class="card">
+  <form method="get" class="filters">
+    <div class="field">
+      <label for="q">Search</label>
+      <input type="text" id="q" name="q" value="{{ filters.q }}" placeholder="Reference, subdomain or text">
+    </div>
+    <div class="field">
+      <label for="domain">Domain</label>
+      <select id="domain" name="domain">
+        <option value="">All domains</option>
+        {% for d in domains %}<option value="{{ d }}" {% if filters.domain == d %}selected{% endif %}>{{ d }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="status">Status</label>
+      <select id="status" name="status">
+        <option value="">Any status</option>
+        {% for s in statuses %}<option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="tier">Scope</label>
+      <select id="tier" name="tier">
+        <option value="in_scope" {% if filters.tier == 'in_scope' %}selected{% endif %}>Tracked by prototype</option>
+        <option value="catalog_only" {% if filters.tier == 'catalog_only' %}selected{% endif %}>Catalogue reference only</option>
+        <option value="all" {% if filters.tier == 'all' %}selected{% endif %}>All 108 controls</option>
+      </select>
+    </div>
+    <button class="btn" type="submit">Apply</button>
+    <a class="btn ghost" href="{{ url_for('controls.index') }}">Reset</a>
+  </form>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Ref</th><th>Subdomain</th><th>Control</th>
+        <th>Owner</th><th>Status</th><th>Review</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for c in controls %}
+      <tr>
+        <td class="ref"><a href="{{ url_for('controls.detail', control_id=c.control_id) }}">{{ c.ecc_reference }}</a></td>
+        <td>{{ c.subdomain }}</td>
+        <td class="desc">{{ c.description[:150] }}{% if c.description|length > 150 %}&hellip;{% endif %}</td>
+        <td>{{ c.owner_name or '—' }}</td>
+        <td>{{ status_badge(c.status) }}</td>
+        <td class="muted">{{ c.review_date.strftime('%d %b %Y') if c.review_date else '—' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="muted">No controls match that filter.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if pages > 1 %}
+  <div class="pager">
+    {% set args = {'domain': filters.domain, 'status': filters.status, 'tier': filters.tier, 'q': filters.q} %}
+    {% if page > 1 %}<a href="{{ url_for('controls.index', page=page-1, **args) }}">Previous</a>{% endif %}
+    <span class="cur">Page {{ page }} of {{ pages }}</span>
+    {% if page < pages %}<a href="{{ url_for('controls.index', page=page+1, **args) }}">Next</a>{% endif %}
+    <span class="muted">{{ total }} controls</span>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
