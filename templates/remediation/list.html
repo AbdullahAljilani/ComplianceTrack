@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Remediation Tracker &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<h1>Remediation Tracker</h1>
+<p class="sub">Open work is ordered by derived state, then by priority, then by due date.
+  Overdue is calculated on read from the due date, never stored as a flag.</p>
+
+<div class="grid grid-4">
+  <div class="stat"><div class="n">{{ counts.get('Open', 0) }}</div><div class="l">Open</div></div>
+  <div class="stat"><div class="n">{{ counts.get('In Progress', 0) }}</div><div class="l">In progress</div></div>
+  <div class="stat"><div class="n">{{ overdue }}</div><div class="l">Overdue</div></div>
+  <div class="stat"><div class="n">{{ counts.get('Closed', 0) }}</div><div class="l">Closed</div></div>
+</div>
+
+<p>
+  <a href="{{ url_for('remediation.index') }}">All</a> &middot;
+  <a href="{{ url_for('remediation.index', status='Open') }}">Open</a> &middot;
+  <a href="{{ url_for('remediation.index', status='In Progress') }}">In progress</a> &middot;
+  <a href="{{ url_for('remediation.index', status='Closed') }}">Closed</a>
+  {% if can('remediation.edit') %}
+    &nbsp;&nbsp;<a href="{{ url_for('remediation.new') }}"><b>Raise a finding</b></a>
+  {% endif %}
+</p>
+
+<div class="card">
+  <table>
+    <thead><tr><th>#</th><th>Control</th><th>Finding</th><th>Owner</th>
+      <th>Priority</th><th>Due</th><th>State</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    {% for i in items %}
+      <tr>
+        <td class="muted">{{ i.remediation_id }}</td>
+        <td><a href="{{ url_for('controls.detail', control_id=i.control_id) }}">{{ i.ecc_reference }}</a></td>
+        <td>{{ i.finding }}
+          {% if i.closure_note %}<div class="muted">Closed: {{ i.closure_note }}</div>{% endif %}</td>
+        <td class="muted">{{ i.owner_name }}</td>
+        <td><span class="pill p-{{ i.priority | lower }}">{{ i.priority }}</span></td>
+        <td class="muted">{{ i.due_date.strftime('%d %b %Y') }}</td>
+        <td>
+          {% if i.derived_state == 'overdue' %}
+            <b class="danger">Overdue by {{ i.derived_days }} d</b>
+          {% elif i.derived_state == 'due_soon' %}
+            Due in {{ i.derived_days }} d
+          {% elif i.derived_state == 'closed' %}
+            <span class="muted">&ndash;</span>
+          {% else %}
+            <span class="muted">{{ i.derived_days }} d remaining</span>
+          {% endif %}
+        </td>
+        <td>{{ i.status }}</td>
+        <td>
+          {% if can('remediation.edit') and i.status != 'Closed' %}
+            <form method="post" action="{{ url_for('remediation.advance', remediation_id=i.remediation_id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" name="status" value="In Progress">Start</button>
+            </form>
+            <form method="post" action="{{ url_for('remediation.close', remediation_id=i.remediation_id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="text" name="note" placeholder="What was done" maxlength="1000">
+              <button type="submit">Close</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="muted">Closure requires a note of at least 10 characters and is limited to
+    the assigned owner or a GRC Administrator, so the record shows what was done and who
+    accepted it.</p>
+</div>
+{% endblock %}

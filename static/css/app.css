@@ -110,3 +110,19 @@ input:focus,select:focus{outline:2px solid #9ecfc1;outline-offset:0;border-color
 .creds code{background:#eef0f2;padding:1px 5px;border-radius:4px;color:#33404d}
 footer{border-top:1px solid var(--line);margin-top:30px;padding:16px 0;font-size:12.5px;
   color:var(--muted);background:#fff}
+
+/* Unit 5: evidence and remediation */
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;
+  font-weight:600;border:1px solid}
+.p-approved{background:#e6f4ec;border-color:#bfe3d0;color:#14603f}
+.p-pendingreview{background:#fdf3de;border-color:#f0dcae;color:#7d5700}
+.p-rejected{background:#fbeaea;border-color:#f0c9c9;color:#8f2525}
+.p-low{background:#eef0f2;border-color:#dce0e5;color:#48525c}
+.p-medium{background:#eef5f3;border-color:#cfe1db;color:#2c4a42}
+.p-high{background:#fdf3de;border-color:#f0dcae;color:#7d5700}
+.p-critical{background:#fbeaea;border-color:#f0c9c9;color:#8f2525}
+.danger{color:#8f2525}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+td form{display:inline-block;margin:0 4px 4px 0}
+td form input[type=text]{width:120px;padding:3px 6px;font-size:12.5px}
+td form button{padding:3px 9px;font-size:12.5px}

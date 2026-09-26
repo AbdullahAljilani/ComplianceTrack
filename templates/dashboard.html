@@ -2,50 +2,78 @@
 {% block title %}Dashboard &middot; ComplianceTrack{% endblock %}
 {% block content %}
 <h1>Compliance tracking summary</h1>
-<p class="sub">Tracking information only. This summary does not certify compliance with NCA ECC-2:2024.</p>
+<p class="sub">Tracking information only. This summary reports what has been recorded
+in the system. It does not assess or certify compliance with NCA ECC-2:2024.</p>
 
 <div class="grid grid-4">
-  <div class="stat"><div class="n">{{ totals.tracked }}</div><div class="l">Controls tracked</div></div>
-  <div class="stat"><div class="n">{{ totals.implemented }}</div><div class="l">Recorded as implemented</div></div>
-  <div class="stat"><div class="n">{{ totals.evidence_missing }}</div><div class="l">Evidence missing</div></div>
-  <div class="stat"><div class="n">{{ overdue }}</div><div class="l">Overdue remediation items</div></div>
+  <div class="stat">
+    <div class="n">{{ summary.implementation.score }}%</div>
+    <div class="l">Weighted implementation score</div>
+  </div>
+  <div class="stat">
+    <div class="n">{{ summary.evidence.percent }}%</div>
+    <div class="l">Evidence coverage
+      ({{ summary.evidence.evidenced }} of {{ summary.evidence.assessed }})</div>
+  </div>
+  <div class="stat">
+    <div class="n">{{ summary.remediation.overdue }}</div>
+    <div class="l">Overdue remediation
+      ({{ summary.remediation.open }} open)</div>
+  </div>
+  <div class="stat">
+    <div class="n">{{ summary.remediation.exposure_index }}</div>
+    <div class="l">Priority-weighted exposure</div>
+  </div>
 </div>
 
 <p></p>
 
 <div class="grid grid-2">
   <div class="card">
-    <h2>Coverage by domain</h2>
+    <h2>Weighted progress by domain</h2>
     <table>
-      <thead><tr><th>Domain</th><th>Tracked</th><th>Catalogue only</th><th>Implemented</th><th>Progress</th></tr></thead>
+      <thead><tr><th>Domain</th><th>Assessed</th><th>Excluded</th>
+        <th>Catalogue only</th><th>Score</th></tr></thead>
       <tbody>
-      {% for d in by_domain %}
-        {% set pct = (d.implemented * 100 // d.tracked) if d.tracked else 0 %}
+      {% for d in summary.by_domain %}
         <tr>
           <td>{{ d.domain }}</td>
-          <td>{{ d.tracked }}</td>
-          <td class="muted">{{ d.catalog }}</td>
-          <td>{{ d.implemented }}</td>
+          <td>{{ d.assessed }}</td>
+          <td class="muted">{{ d.excluded }}</td>
+          <td class="muted">{{ catalog_by_domain.get(d.domain, 0) }}</td>
           <td>
-            <div class="bar"><i class="w{{ (pct / 5) | round(0, 'floor') | int * 5 }}"></i></div>
-            <span class="muted">{{ pct }}%</span>
+            <div class="bar"><i class="w{{ (d.score / 5) | round(0, 'floor') | int * 5 }}"></i></div>
+            <span class="muted">{{ d.score }}%</span>
           </td>
         </tr>
       {% endfor %}
       </tbody>
     </table>
-    <p class="muted">Catalogue-only entries are shown so the register reflects the full
-    108-control framework. They are not assessed, and are excluded from progress.</p>
+    <p class="muted">Weakest domain first. Scored as
+      {% for s, w in weights.items() %}{{ s }} = {{ w }}{{ ", " if not loop.last }}{% endfor %}.
+      Not Applicable and catalogue-only entries are excluded from both sides of
+      the calculation, so scoping a control out neither raises nor lowers the score.</p>
   </div>
 
   <div class="card">
     <h2>Status breakdown</h2>
     <table>
-      <thead><tr><th>Status</th><th>Controls</th></tr></thead>
+      <thead><tr><th>Status</th><th>Controls</th><th>Weight</th></tr></thead>
       <tbody>
       {% for s in by_status %}
-        <tr><td>{{ s.status }}</td><td>{{ s.n }}</td></tr>
+        <tr><td>{{ s.status }}</td><td>{{ s.n }}</td>
+          <td class="muted">{{ weights.get(s.status, 'excluded') }}</td></tr>
       {% endfor %}
+      </tbody>
+    </table>
+    <table>
+      <thead><tr><th>Tracking register</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Controls tracked</td><td>{{ totals.tracked }}</td></tr>
+        <tr><td>Catalogue entries, not assessed</td><td class="muted">{{ totals.catalog }}</td></tr>
+        <tr><td>Controls past their review date</td><td>{{ summary.due_review }}</td></tr>
+        <tr><td>Longest overdue remediation</td>
+            <td>{{ summary.remediation.max_days_overdue }} days</td></tr>
       </tbody>
     </table>
   </div>
@@ -60,14 +88,16 @@
     {% for a in audit_recent %}
       <tr>
         <td class="muted">{{ a.occurred_at.strftime('%d %b %H:%M') }}</td>
-        <td>{{ a.username or '—' }}</td>
+        <td>{{ a.username or '&mdash;' }}</td>
         <td>{{ a.action }}</td>
         <td class="muted">{{ a.entity_type }} #{{ a.entity_id }}</td>
         <td class="muted">
           {%- if a.details and a.details.get('ecc_reference') -%}
             {{ a.details['ecc_reference'] }}: {{ a.details['from'] }} &rarr; {{ a.details['to'] }}
+          {%- elif a.details and a.details.get('decision') -%}{{ a.details['decision'] }}
+          {%- elif a.details and a.details.get('control') -%}{{ a.details['control'] }}
           {%- elif a.details and a.details.get('role') -%}{{ a.details['role'] }}
-          {%- else -%}—{%- endif -%}
+          {%- else -%}&ndash;{%- endif -%}
         </td>
       </tr>
     {% endfor %}

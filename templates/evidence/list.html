@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Evidence &middot; {{ control.ecc_reference }}{% endblock %}
+{% block content %}
+<p class="muted"><a href="{{ url_for('controls.detail', control_id=control.control_id) }}">
+  &larr; Back to {{ control.ecc_reference }}</a></p>
+
+<h1>Evidence for {{ control.ecc_reference }}</h1>
+<p class="sub">Current control status: <b>{{ control.status }}</b>.
+  A control reaches Implemented only while approved evidence supports it.</p>
+
+{% if can('evidence.upload') and control.scope_tier == 'in_scope' %}
+<div class="card">
+  <h2>Upload supporting evidence</h2>
+  <form method="post" enctype="multipart/form-data"
+        action="{{ url_for('evidence.upload', control_id=control.control_id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p><input type="file" name="document" required></p>
+    <p><input type="text" name="description" maxlength="500" style="width:60%"
+              placeholder="What this document shows"></p>
+    <p><button type="submit">Upload for review</button></p>
+  </form>
+  <p class="muted">Accepted formats: {{ allowed | join(', ') }}. Maximum {{ max_mb }} MB.
+    The file is stored outside the web root under a generated name, and its
+    SHA-256 digest is recorded so the stored copy can be shown not to have changed.</p>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Version history</h2>
+  {% if not records %}
+    <p class="muted">No evidence has been filed against this control yet.</p>
+  {% else %}
+  <table>
+    <thead><tr><th>Ver</th><th>File</th><th>Uploaded by</th><th>Status</th>
+      <th>Reviewed by</th><th>SHA-256</th><th></th></tr></thead>
+    <tbody>
+    {% for r in records %}
+      <tr>
+        <td><b>v{{ r.version_no }}</b></td>
+        <td>{{ r.file_name }}
+          {% if r.description %}<div class="muted">{{ r.description }}</div>{% endif %}
+          <div class="muted">{{ r.uploaded_at.strftime('%d %b %Y %H:%M') }},
+            {{ (r.size_bytes or 0) // 1024 }} KB</div></td>
+        <td>{{ r.uploaded_by_name }}</td>
+        <td><span class="pill p-{{ r.status | replace(' ', '') | lower }}">{{ r.status }}</span>
+          {% if r.review_note %}<div class="muted">{{ r.review_note }}</div>{% endif %}</td>
+        <td class="muted">{{ r.reviewed_by_name or '&ndash;' | safe }}</td>
+        <td class="muted mono">{{ r.sha256_hash[:16] }}&hellip;</td>
+        <td>
+          {% if can('evidence.review') and r.status == 'Pending Review' %}
+          <form method="post" action="{{ url_for('evidence.review', evidence_id=r.evidence_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="control_id" value="{{ control.control_id }}">
+            <input type="text" name="note" placeholder="Review note" maxlength="500">
+            <button type="submit" name="decision" value="approve">Approve</button>
+            <button type="submit" name="decision" value="reject">Reject</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p class="muted">Evidence must be reviewed by someone other than the person who
+    uploaded it. Rejecting the last approved record supporting an Implemented
+    control returns that control to Evidence Missing.</p>
+  {% endif %}
+</div>
+{% endblock %}

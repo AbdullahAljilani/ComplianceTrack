@@ -5,9 +5,9 @@ Flask application layer holding the feature modules, shared Authentication /
 Authorization and Audit Logging services that every module calls, and a
 PostgreSQL data layer reached only through src.db.
 
-Unit 4 scope: the Control Register and the Reporting Dashboard are implemented.
-Evidence Management and the Remediation Tracker are designed but not yet built;
-their tables exist and the rules that depend on them are already enforced.
+Unit 5 scope: all four modules are implemented. Unit 4 shipped the Control
+Register and the Reporting Dashboard; Unit 5 adds Evidence Management and the
+Remediation Tracker, and moves the dashboard onto the scoring service.
 """
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
@@ -15,6 +15,8 @@ from flask_wtf.csrf import CSRFProtect
 from config import Config
 from src import db
 from src.control_register import routes as control_routes
+from src.evidence_management import routes as evidence_routes
+from src.remediation_tracker import routes as remediation_routes
 from src.reporting_dashboard import routes as dashboard_routes
 from src.services import auth
 from src.services import auth_routes
@@ -35,6 +37,8 @@ def create_app(config_object=Config):
     app.register_blueprint(auth_routes.bp)
     app.register_blueprint(dashboard_routes.bp)
     app.register_blueprint(control_routes.bp)
+    app.register_blueprint(evidence_routes.bp)
+    app.register_blueprint(remediation_routes.bp)
 
     @app.context_processor
     def inject_user():
@@ -43,6 +47,7 @@ def create_app(config_object=Config):
     @app.errorhandler(404)
     def not_found(_):
         return render_template("404.html"), 404
+
 
     @app.after_request
     def security_headers(resp):
