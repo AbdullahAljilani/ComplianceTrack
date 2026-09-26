@@ -24,27 +24,27 @@ def item(rid, status="Open", priority="Medium", due=None, owner=2):
 def test_a_well_formed_finding_is_accepted(today):
     ok, reason = service.validate_new_item(
         "Privileged access review has not been evidenced this cycle.",
-        "High", today + timedelta(days=30), today)
+        7, "High", today + timedelta(days=30), today)
     assert (ok, reason) == (True, None)
 
 
 @pytest.mark.whitebox
 def test_a_finding_must_be_described(today):
-    ok, reason = service.validate_new_item("gap", "High",
+    ok, reason = service.validate_new_item("gap", 7, "High",
                                            today + timedelta(days=5), today)
     assert not ok and "10 characters" in reason
 
 
 @pytest.mark.whitebox
 def test_an_unknown_priority_is_refused(today):
-    ok, reason = service.validate_new_item("A described finding here.",
+    ok, reason = service.validate_new_item("A described finding here.", 7,
                                            "Urgent", today + timedelta(days=5), today)
     assert not ok and "not a valid priority" in reason
 
 
 @pytest.mark.whitebox
 def test_a_missing_due_date_is_refused(today):
-    ok, reason = service.validate_new_item("A described finding here.",
+    ok, reason = service.validate_new_item("A described finding here.", 7,
                                            "Low", None, today)
     assert not ok and "due date" in reason
 
@@ -53,14 +53,14 @@ def test_a_missing_due_date_is_refused(today):
 def test_a_due_date_in_the_past_is_refused(today):
     """An item that is overdue the moment it is raised says nothing about
     whether anyone is late, so the form refuses it."""
-    ok, reason = service.validate_new_item("A described finding here.",
+    ok, reason = service.validate_new_item("A described finding here.", 7,
                                            "Low", today - timedelta(days=1), today)
     assert not ok and "cannot be in the past" in reason
 
 
 @pytest.mark.whitebox
 def test_a_due_date_of_today_is_allowed(today):
-    ok, _ = service.validate_new_item("A described finding here.", "Low",
+    ok, _ = service.validate_new_item("A described finding here.", 7, "Low",
                                       today, today)
     assert ok
 
@@ -173,3 +173,12 @@ def test_a_closed_item_is_never_annotated_as_overdue(today):
     closed = item(1, status="Closed", due=today - timedelta(days=200))
     assert service.annotate([closed], today)[0]["derived_state"] == "closed"
 
+
+@pytest.mark.whitebox
+def test_a_finding_with_no_owner_is_refused(today):
+    """Regression. The browser marks the owner field required, but a request
+    built by hand omits it, and the missing value used to reach the database
+    as an unhandled not-null violation."""
+    ok, reason = service.validate_new_item("A described finding here.", None,
+                                           "High", today + timedelta(days=7), today)
+    assert not ok and "owner" in reason.lower()
