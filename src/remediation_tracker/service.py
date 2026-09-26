@@ -26,15 +26,23 @@ MIN_CLOSURE_NOTE = 10
 # Section 1: pure decisions
 # ---------------------------------------------------------------------------
 
-def validate_new_item(finding, priority, due, today):
+def validate_new_item(finding, owner_user_id, priority, due, today):
     """Check a proposed finding before it is written.
 
     Returns (True, None) or (False, reason). A due date in the past is refused
     at creation: an item that is overdue the moment it is raised carries no
     information about whether anyone is late.
+
+    The owner check was added in Unit 5 after a test submitted the form without
+    the owner field. The browser marks that field required, but that is
+    presentation, and a request built by hand simply omits it. Without this
+    check the missing value reached the database and raised an unhandled
+    not-null violation, which the user saw as a server error.
     """
     if len((finding or "").strip()) < 10:
         return False, "Describe the finding in at least 10 characters."
+    if owner_user_id is None:
+        return False, "A remediation item must be assigned to an owner."
     if priority not in VALID_PRIORITIES:
         return False, f"'{priority}' is not a valid priority."
     if due is None:
@@ -142,7 +150,8 @@ def list_for_control(control_id, today=None):
 
 def create_item(control_id, finding, owner_user_id, priority, due, actor_id,
                 today=None):
-    ok, reason = validate_new_item(finding, priority, due, today or date.today())
+    ok, reason = validate_new_item(finding, owner_user_id, priority, due,
+                                   today or date.today())
     if not ok:
         return None, reason
 
@@ -152,6 +161,12 @@ def create_item(control_id, finding, owner_user_id, priority, due, actor_id,
     )
     if control is None:
         return None, "That control does not exist."
+    owner = db.query_one(
+        "SELECT user_id FROM users WHERE user_id = %s AND is_active",
+        (owner_user_id,),
+    )
+    if owner is None:
+        return None, "That owner is not an active user."
     if control["scope_tier"] != "in_scope":
         return None, ("Catalogue-only entries are not assessed, so no "
                       "remediation item can be raised against them.")

@@ -48,6 +48,15 @@ def create_app(config_object=Config):
     def not_found(_):
         return render_template("404.html"), 404
 
+    # Flask refuses a request over MAX_CONTENT_LENGTH before the view runs, so
+    # the size message inside the evidence service never gets the chance to
+    # fire. Without this handler the user is dropped onto a bare framework
+    # error page. Added in Unit 5 after a test caught exactly that.
+    @app.errorhandler(413)
+    def payload_too_large(_):
+        return render_template(
+            "413.html",
+            max_mb=app.config["MAX_CONTENT_LENGTH"] // (1024 * 1024)), 413
 
     @app.after_request
     def security_headers(resp):
