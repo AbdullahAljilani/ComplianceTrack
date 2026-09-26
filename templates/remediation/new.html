@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Raise a finding &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<p class="muted"><a href="{{ url_for('remediation.index') }}">&larr; Back to the tracker</a></p>
+<h1>Raise a remediation finding</h1>
+
+<div class="card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p><label>Control<br>
+      <select name="control_id" required style="width:60%">
+        {% for c in controls %}
+          <option value="{{ c.control_id }}"
+            {% if form.get('control_id') == c.control_id | string %}selected{% endif %}>
+            {{ c.ecc_reference }} &mdash; {{ c.description[:80] }}</option>
+        {% endfor %}
+      </select></label></p>
+
+    <p><label>Finding<br>
+      <textarea name="finding" rows="3" style="width:60%" required
+        minlength="10">{{ form.get('finding', '') }}</textarea></label></p>
+
+    <p><label>Owner<br>
+      <select name="owner_user_id" required>
+        {% for o in owners %}<option value="{{ o.user_id }}">{{ o.full_name }}</option>{% endfor %}
+      </select></label></p>
+
+    <p><label>Priority<br>
+      <select name="priority" required>
+        {% for p in priorities %}<option value="{{ p }}">{{ p }}</option>{% endfor %}
+      </select></label></p>
+
+    <p><label>Due date<br>
+      <input type="date" name="due_date" value="{{ form.get('due_date', '') }}" required></label></p>
+
+    <p><button type="submit">Raise finding</button></p>
+  </form>
+  <p class="muted">The due date must not be in the past. An item that is overdue the
+    moment it is raised carries no information about whether anyone is late.</p>
+</div>
+{% endblock %}
