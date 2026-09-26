@@ -1,0 +1,85 @@
+name: CI
+
+# Continuous integration only. Unit 4 committed this project to CI without
+# continuous deployment: the prototype has no production environment, and an
+# automatic release would conflict with the reviewer-approval principle in the
+# Unit 3 design. Unit 5 implements that commitment.
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: compliancetrack
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest ruff pip-audit
+
+      - name: Lint
+        run: ruff check src tests scripts app.py config.py
+
+      # The unit tests need no database. They run first so a logic error is
+      # reported in seconds rather than after the schema has been loaded.
+      - name: Unit tests
+        run: python -m pytest -m "not integration"
+
+      - name: Load the schema and seed data
+        env:
+          PGPASSWORD: postgres
+        run: |
+          for f in database/schema.sql \
+                   database/migrations/001_unit4_scope_tier.sql \
+                   database/seed_reference_data.sql \
+                   database/seed_ecc_controls.sql \
+                   database/migrations/002_unit5_core_logic.sql \
+                   database/seed_unit5_workflow.sql; do
+            psql -h localhost -U postgres -d compliancetrack -v ON_ERROR_STOP=1 -f "$f"
+          done
+          python scripts/seed_evidence_demo.py
+          python scripts/reconcile_evidence_gate.py
+
+      - name: Integration tests
+        env:
+          DB_HOST: localhost
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: compliancetrack
+          FLASK_SECRET_KEY: ci-only-not-a-secret
+        run: python -m pytest -m integration
+
+      # Evidence is user-supplied file content, so a vulnerable parsing
+      # dependency is a live risk rather than a theoretical one.
+      - name: Dependency audit
+        run: pip-audit --requirement requirements.txt
+        continue-on-error: true
+
+      - name: Check that no secret was committed
+        run: |
+          if git ls-files | grep -qx '.env'; then
+            echo "A .env file is tracked. Secrets must never be committed."
+            exit 1
+          fi

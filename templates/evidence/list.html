@@ -40,7 +40,8 @@
         <td>{{ r.file_name }}
           {% if r.description %}<div class="muted">{{ r.description }}</div>{% endif %}
           <div class="muted">{{ r.uploaded_at.strftime('%d %b %Y %H:%M') }},
-            {{ (r.size_bytes or 0) // 1024 }} KB</div></td>
+            {% if (r.size_bytes or 0) >= 1024 %}{{ (r.size_bytes // 1024) }} KB
+            {%- else %}{{ r.size_bytes or 0 }} bytes{% endif %}</div></td>
         <td>{{ r.uploaded_by_name }}</td>
         <td><span class="pill p-{{ r.status | replace(' ', '') | lower }}">{{ r.status }}</span>
           {% if r.review_note %}<div class="muted">{{ r.review_note }}</div>{% endif %}</td>
