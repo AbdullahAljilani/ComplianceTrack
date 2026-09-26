@@ -8,6 +8,8 @@ audit service.
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from src import db
+from src.evidence_management import service as evidence_service
+from src.remediation_tracker import service as remediation_service
 from src.services import audit
 from src.services.auth import current_user, requires
 
@@ -103,13 +105,14 @@ def detail(control_id):
         """,
         (control_id,),
     )
-    approved_evidence = db.query_one(
-        "SELECT COUNT(*) AS n FROM evidence WHERE control_id = %s AND status = 'Approved'",
-        (control_id,),
-    )["n"]
+    # Unit 5: both figures now come from the modules that own them rather than
+    # from a query repeated here, so one rule change updates every caller.
+    approved_evidence = evidence_service.approved_count(control_id)
+    remediation = remediation_service.list_for_control(control_id)
     return render_template("controls/detail.html", control=control,
                            statuses=ASSESSABLE_STATUSES, history=history,
-                           approved_evidence=approved_evidence)
+                           approved_evidence=approved_evidence,
+                           remediation=remediation)
 
 
 @bp.route("/<int:control_id>/status", methods=["POST"])
@@ -136,11 +139,7 @@ def update_status(control_id):
     # supporting it has been approved by a reviewer. Enforced in the application
     # layer, not merely hidden in the interface.
     if new_status == "Implemented":
-        approved = db.query_one(
-            "SELECT COUNT(*) AS n FROM evidence WHERE control_id = %s AND status = 'Approved'",
-            (control_id,),
-        )["n"]
-        if approved == 0:
+        if evidence_service.approved_count(control_id) == 0:
             flash("A control cannot be marked Implemented until supporting "
                   "evidence has been approved by a reviewer.", "danger")
             return redirect(url_for("controls.detail", control_id=control_id))

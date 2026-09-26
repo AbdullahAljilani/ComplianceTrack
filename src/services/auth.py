@@ -19,14 +19,33 @@ _hasher = PasswordHasher()
 
 # Capability matrix. Roles are data in the database; what each role may DO is
 # policy and lives here so a single grant is visible in one place.
+#
+# Unit 5 extends the matrix with the four grants the Evidence Management and
+# Remediation Tracker modules need. Two separations of duty are expressed here
+# rather than in the modules:
+#
+#   - Nobody holds both 'evidence.upload' and 'evidence.review' as the only
+#     route to an approval. The GRC Administrator holds both, so the service
+#     layer additionally refuses a reviewer who is also the uploader, which is
+#     the check that actually protects the Implemented gate.
+#   - 'remediation.edit' lets the Internal Auditor raise a finding, but the
+#     service layer limits closing an item to its owner or an administrator,
+#     so the party that reports a gap does not also sign it off.
 PERMISSIONS = {
-    "GRC Administrator": {"control.view", "control.edit", "evidence.view",
-                          "remediation.view", "report.view", "audit.view"},
-    "Control Owner": {"control.view", "control.edit", "evidence.view", "report.view"},
-    "Evidence Custodian": {"control.view", "evidence.view"},
-    "Internal Auditor": {"control.view", "evidence.view", "remediation.view",
+    "GRC Administrator": {"control.view", "control.edit",
+                          "evidence.view", "evidence.upload", "evidence.review",
+                          "remediation.view", "remediation.edit",
+                          "report.view", "audit.view"},
+    "Control Owner": {"control.view", "control.edit",
+                      "evidence.view", "evidence.upload",
+                      "remediation.view", "remediation.edit", "report.view"},
+    "Evidence Custodian": {"control.view", "evidence.view", "evidence.upload",
+                           "remediation.view"},
+    "Internal Auditor": {"control.view", "evidence.view", "evidence.review",
+                         "remediation.view", "remediation.edit",
                          "report.view", "audit.view"},
-    "Management": {"control.view", "report.view"},
+    "Management": {"control.view", "evidence.view", "remediation.view",
+                   "report.view"},
 }
 
 

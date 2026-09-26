@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}File too large &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<h1>That file is too large</h1>
+<div class="notice">
+  The upload exceeds the {{ max_mb }} MB limit for a single request, so it was
+  refused before it reached the evidence module. Nothing has been stored and no
+  existing record has changed.
+</div>
+<p class="muted">Evidence is meant to be a document supporting one control, not an
+archive. If the material genuinely runs to this size, file the signed summary and
+reference where the full set is held.</p>
+<p><a class="btn ghost" href="{{ url_for('controls.index') }}">Back to the register</a></p>
+{% endblock %}

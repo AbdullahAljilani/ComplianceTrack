@@ -1,5 +1,12 @@
--- ComplianceTrack reference data (roles and synthetic users).
--- Generated for Unit 4. Synthetic data only; no real personal data.
+-- ComplianceTrack reference data (roles and synthetic accounts).
+-- Synthetic data only. No real personal data is used anywhere in the project.
+--
+-- Unit 5 refinement, documented rather than silent: the Unit 4 seed used
+-- invented personal names. Those have been replaced with the project owner's
+-- own account plus neutral role labels, so the prototype contains no invented
+-- personal data at all. Roles, permissions and every control assignment are
+-- otherwise unchanged.
+--
 -- Demonstration password for every seeded account: ChangeMe#2026
 
 INSERT INTO roles (role_name, description) VALUES
@@ -11,16 +18,16 @@ INSERT INTO roles (role_name, description) VALUES
 ON CONFLICT (role_name) DO NOTHING;
 
 INSERT INTO users (username, password_hash, full_name, role_id) VALUES
-  ('a.rashid', '$argon2id$v=19$m=65536,t=3,p=4$xn3aS4BIMxS7UAk3F9hs0A$8LRxhDgsgOCrbyyUl8NXooScSagYHYxVqxffVuwP13c', 'Aisha Al-Rashid',
+  ('Abdullah.Aljilani', '$argon2id$v=19$m=65536,t=3,p=4$cMJ3dbq1oy0DnJZRVqA36Q$GW5LEyUVYC2hWIvSl+RyAA3En+0zFp2PFUZkJQuJhfs', 'Abdullah Aljilani',
    (SELECT role_id FROM roles WHERE role_name = 'GRC Administrator')),
-  ('m.otaibi', '$argon2id$v=19$m=65536,t=3,p=4$O6TaywN3GZpXJbGB08KtDA$MSM4Y5NqmphS4G1XXwmMlsuwPHybEb2i1U/4KuUtG60', 'Mohammed Al-Otaibi',
+  ('ControlOwner01', '$argon2id$v=19$m=65536,t=3,p=4$9BAcoUwJRPb9s2WB6ryU9w$qwlwHuDtaveekxHpnPfrCXlQ8KrAdM8c9QVxxw8HLuc', 'Control Owner 01',
    (SELECT role_id FROM roles WHERE role_name = 'Control Owner')),
-  ('s.harbi', '$argon2id$v=19$m=65536,t=3,p=4$JqjQWhXbtsvV3rC8JALK6g$kl6HOCT2mpXHQRaVu+HPLLTDO2Pcz3SwF1xSbB+blYM', 'Sara Al-Harbi',
+  ('ControlOwner02', '$argon2id$v=19$m=65536,t=3,p=4$XcxTxkSi36n2F0fJPajyzA$aoMMuDJZUqnAgTzW+TAPktYzqJNn1L43KGGbou+cPJo', 'Control Owner 02',
    (SELECT role_id FROM roles WHERE role_name = 'Control Owner')),
-  ('k.dossari', '$argon2id$v=19$m=65536,t=3,p=4$hBNvrudOPgra/SB8WJ9Ozg$DMkwd7aQl5dq7IY/M7Y3QcDAhpZNKFypPUsYZRqgmrM', 'Khalid Al-Dossari',
+  ('Custodian01', '$argon2id$v=19$m=65536,t=3,p=4$VsYrvK1gbzACTwwlXANKJQ$477O3xcphW4DKCRio+svVa4thFuV7SzRhbq2/nstrwA', 'Evidence Custodian 01',
    (SELECT role_id FROM roles WHERE role_name = 'Evidence Custodian')),
-  ('n.zahrani', '$argon2id$v=19$m=65536,t=3,p=4$ChJ3ICsHBqHxSkRxoiU5pA$/Ab/qXwhbXchGPxQ7/kDhfLKHooHkB15uW4G5bBnK+s', 'Noura Al-Zahrani',
+  ('Auditor01', '$argon2id$v=19$m=65536,t=3,p=4$6Vy2Qk3gMjTzHSfQQSH+hQ$G5HTT7QqVdHPB1bUNaP4D8FfRZCFEP19hL8uU/44AO0', 'Internal Auditor 01',
    (SELECT role_id FROM roles WHERE role_name = 'Internal Auditor')),
-  ('f.qahtani', '$argon2id$v=19$m=65536,t=3,p=4$/XKoEop+LeHSgL73s4N56Q$LqfPHWHE8dnYKzDHVC2Upy9wf4nd+UJ19HbjVLEs6n0', 'Faisal Al-Qahtani',
+  ('Manager01', '$argon2id$v=19$m=65536,t=3,p=4$/uajV4c1eF3lbbGtMOfkgg$yofzr25YHPq01Koxuclhcvhzyy4KMMuCdbLZQnYcskE', 'Management User 01',
    (SELECT role_id FROM roles WHERE role_name = 'Management'))
 ON CONFLICT (username) DO NOTHING;
