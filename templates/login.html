@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Sign in &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<div class="login-wrap">
+  <div class="card">
+    <h1 class="login-title">Sign in</h1>
+    <p class="sub">ComplianceTrack &middot; NCA ECC-2:2024 compliance tracking</p>
+    <form method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" value="{{ username }}" autocomplete="username" required autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <p></p>
+      <button class="btn" type="submit">Sign in</button>
+    </form>
+    <div class="creds">
+      <b>Demonstration accounts</b> (synthetic, password <code>ChangeMe#2026</code>)<br>
+      <code>a.rashid</code> GRC Administrator &middot;
+      <code>m.otaibi</code> Control Owner<br>
+      <code>n.zahrani</code> Internal Auditor &middot;
+      <code>f.qahtani</code> Management (read-only)
+    </div>
+  </div>
+</div>
+{% endblock %}
