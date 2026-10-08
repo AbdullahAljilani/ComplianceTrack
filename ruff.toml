@@ -1,0 +1,10 @@
+# Lint configuration, written down so the verdict does not depend on whichever
+# ruff release is current when CI runs. Unit 6 found that ruff 0.16 widened its
+# default rule set: the same command reported 35 findings with 0.16.10 and none
+# with 0.15.22. The rule set below is the one the code base is written to; the
+# tool version is pinned in requirements-dev.txt.
+target-version = "py311"
+extend-exclude = [".venv", "docs"]
+
+[lint]
+select = ["E4", "E7", "E9", "F"]

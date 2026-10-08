@@ -1,0 +1,8 @@
+endpoint,path,n,mean_ms,p50_ms,p95_ms,p99_ms,max_ms
+Sign-in page,/login,200,1.8,1.7,2.6,3.2,5.9
+Dashboard,/,200,15.5,15.0,19.2,20.6,21.1
+Control Register,/controls/,200,13.4,12.9,17.3,19.8,21.5
+Register search,/controls/?q=access,200,14.5,14.0,18.0,20.1,21.2
+Control detail,/controls/1,200,12.5,12.0,16.4,19.0,22.4
+Evidence page,/evidence/control/1,200,11.7,11.4,15.4,16.7,17.8
+Remediation Tracker,/remediation/,200,13.1,12.7,16.7,18.3,20.1

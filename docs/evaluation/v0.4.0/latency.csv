@@ -1,0 +1,11 @@
+endpoint,path,n,mean_ms,p50_ms,p95_ms,p99_ms,max_ms
+Sign-in page,/login,200,1.7,1.6,2.2,2.8,3.9
+Dashboard,/,200,16.8,16.1,22.0,24.0,28.4
+Control Register,/controls/,200,14.9,14.8,18.7,20.1,20.6
+Register search,/controls/?q=access,200,15.5,15.3,19.1,21.6,27.8
+Control detail,/controls/1,200,15.6,15.4,19.8,21.3,23.0
+Evidence page,/evidence/control/1,200,11.9,11.6,15.2,16.6,17.9
+Remediation Tracker,/remediation/,200,14.4,14.0,18.2,20.1,21.3
+Domain summary export,/reports/domain-summary.csv,200,15.7,14.9,20.6,23.8,31.1
+Control extract export,/reports/controls.csv,200,15.7,15.4,19.6,20.7,21.5
+Summary API,/api/summary,200,15.5,15.1,20.0,22.3,24.9

@@ -1,0 +1,755 @@
+{
+  "meta": {
+    "label": "v0.4.0",
+    "git": "6211d57",
+    "run_at_utc": "2026-10-07T04:33:31+00:00",
+    "platform": "Linux-6.18.44-fc-v77-x86_64-with-glibc2.39",
+    "python": "3.12.3",
+    "cpu_logical": 2,
+    "memory_gb": 8.4,
+    "postgresql": "16.15 (Ubuntu 16.15-0ubuntu0.24.04.1)",
+    "server": "waitress, 8 threads, 127.0.0.1",
+    "requests_per_endpoint": 200,
+    "warmup": 20,
+    "load_order": [
+      "schema.sql",
+      "migrations/001_unit4_scope_tier.sql",
+      "seed_reference_data.sql",
+      "seed_ecc_controls.sql",
+      "migrations/002_unit5_core_logic.sql",
+      "seed_unit5_workflow.sql",
+      "migrations/003_unit6_closure_verification.sql"
+    ]
+  },
+  "tests": {
+    "total": 223,
+    "passed": 223,
+    "failed": 0,
+    "skipped": 0,
+    "pytest_seconds": 11.44,
+    "wall_seconds": 11.88,
+    "coverage_percent": 88.3,
+    "statements": 881,
+    "statements_covered": 789,
+    "branches": 242,
+    "branches_covered": 203,
+    "exit_code": 0
+  },
+  "roles": {
+    "accounts": [
+      {
+        "account": "Abdullah.Aljilani",
+        "landing": "/",
+        "status": 200
+      },
+      {
+        "account": "ControlOwner01",
+        "landing": "/",
+        "status": 200
+      },
+      {
+        "account": "ControlOwner02",
+        "landing": "/",
+        "status": 200
+      },
+      {
+        "account": "Custodian01",
+        "landing": "/controls/",
+        "status": 200
+      },
+      {
+        "account": "Auditor01",
+        "landing": "/",
+        "status": 200
+      },
+      {
+        "account": "Manager01",
+        "landing": "/",
+        "status": 200
+      }
+    ],
+    "landed_ok": 6,
+    "total": 6
+  },
+  "accuracy": {
+    "checks": [
+      {
+        "check": "service.implementation.assessed",
+        "expected": 61.0,
+        "actual": 61,
+        "match": true
+      },
+      {
+        "check": "service.implementation.excluded",
+        "expected": 7.0,
+        "actual": 7,
+        "match": true
+      },
+      {
+        "check": "service.implementation.weighted_total",
+        "expected": 23.75,
+        "actual": 23.75,
+        "match": true
+      },
+      {
+        "check": "service.implementation.score",
+        "expected": 38.9,
+        "actual": 38.9,
+        "match": true
+      },
+      {
+        "check": "service.evidence.evidenced",
+        "expected": 13.0,
+        "actual": 13,
+        "match": true
+      },
+      {
+        "check": "service.evidence.percent",
+        "expected": 21.3,
+        "actual": 21.3,
+        "match": true
+      },
+      {
+        "check": "service.remediation.open",
+        "expected": 10.0,
+        "actual": 10,
+        "match": true
+      },
+      {
+        "check": "service.remediation.overdue",
+        "expected": 5.0,
+        "actual": 5,
+        "match": true
+      },
+      {
+        "check": "service.remediation.due_soon",
+        "expected": 2.0,
+        "actual": 2,
+        "match": true
+      },
+      {
+        "check": "service.remediation.exposure_index",
+        "expected": 30.0,
+        "actual": 30,
+        "match": true
+      },
+      {
+        "check": "service.remediation.max_days_overdue",
+        "expected": 21.0,
+        "actual": 21,
+        "match": true
+      },
+      {
+        "check": "service.due_review",
+        "expected": 0.0,
+        "actual": 0,
+        "match": true
+      },
+      {
+        "check": "service.domain[Cybersecurity Resilience]",
+        "expected": 31.2,
+        "actual": 31.2,
+        "match": true
+      },
+      {
+        "check": "service.domain[Third-Party and Cloud Computing Cybersecurity]",
+        "expected": 31.2,
+        "actual": 31.2,
+        "match": true
+      },
+      {
+        "check": "service.domain[Cybersecurity Defense]",
+        "expected": 37.5,
+        "actual": 37.5,
+        "match": true
+      },
+      {
+        "check": "service.domain[Cybersecurity Governance]",
+        "expected": 42.7,
+        "actual": 42.7,
+        "match": true
+      },
+      {
+        "check": "tracker.derived_state (per item)",
+        "expected": 12,
+        "actual": 12,
+        "match": true
+      },
+      {
+        "check": "page.dashboard.score",
+        "expected": 38.9,
+        "actual": 38.9,
+        "match": true
+      },
+      {
+        "check": "page.dashboard.coverage",
+        "expected": 21.3,
+        "actual": 21.3,
+        "match": true
+      },
+      {
+        "check": "page.dashboard.overdue",
+        "expected": 5.0,
+        "actual": 5.0,
+        "match": true
+      },
+      {
+        "check": "page.dashboard.exposure_index",
+        "expected": 30.0,
+        "actual": 30.0,
+        "match": true
+      },
+      {
+        "check": "page.tracker.overdue",
+        "expected": 5.0,
+        "actual": 5.0,
+        "match": true
+      },
+      {
+        "check": "api.implementation.score",
+        "expected": 38.9,
+        "actual": 38.9,
+        "match": true
+      },
+      {
+        "check": "api.evidence.percent",
+        "expected": 21.3,
+        "actual": 21.3,
+        "match": true
+      },
+      {
+        "check": "api.remediation.overdue",
+        "expected": 5.0,
+        "actual": 5,
+        "match": true
+      },
+      {
+        "check": "api.remediation.exposure_index",
+        "expected": 30.0,
+        "actual": 30,
+        "match": true
+      },
+      {
+        "check": "export.controls.status (per row)",
+        "expected": 68,
+        "actual": 68,
+        "match": true
+      }
+    ],
+    "matched": 27,
+    "total": 27,
+    "oracle": {
+      "assessed": 61.0,
+      "excluded": 7.0,
+      "weighted_total": 23.75,
+      "evidenced": 13.0,
+      "open": 10.0,
+      "overdue": 5.0,
+      "due_soon": 2.0,
+      "exposure_index": 30.0,
+      "max_days_overdue": 21.0,
+      "due_review": 0.0,
+      "by_domain": {
+        "Cybersecurity Governance": 42.7,
+        "Third-Party and Cloud Computing Cybersecurity": 31.2,
+        "Cybersecurity Defense": 37.5,
+        "Cybersecurity Resilience": 31.2
+      },
+      "score": 38.9,
+      "coverage": 21.3
+    }
+  },
+  "latency": [
+    {
+      "endpoint": "Sign-in page",
+      "path": "/login",
+      "available": true,
+      "bytes": 1989,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 1.7,
+      "p50_ms": 1.6,
+      "p95_ms": 2.2,
+      "p99_ms": 2.8,
+      "max_ms": 3.9
+    },
+    {
+      "endpoint": "Dashboard",
+      "path": "/",
+      "available": true,
+      "bytes": 7556,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 16.8,
+      "p50_ms": 16.1,
+      "p95_ms": 22.0,
+      "p99_ms": 24.0,
+      "max_ms": 28.4
+    },
+    {
+      "endpoint": "Control Register",
+      "path": "/controls/",
+      "available": true,
+      "bytes": 15252,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 14.9,
+      "p50_ms": 14.8,
+      "p95_ms": 18.7,
+      "p99_ms": 20.1,
+      "max_ms": 20.6
+    },
+    {
+      "endpoint": "Register search",
+      "path": "/controls/?q=access",
+      "available": true,
+      "bytes": 6025,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 15.5,
+      "p50_ms": 15.3,
+      "p95_ms": 19.1,
+      "p99_ms": 21.6,
+      "max_ms": 27.8
+    },
+    {
+      "endpoint": "Control detail",
+      "path": "/controls/1",
+      "available": true,
+      "bytes": 3964,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 15.6,
+      "p50_ms": 15.4,
+      "p95_ms": 19.8,
+      "p99_ms": 21.3,
+      "max_ms": 23.0
+    },
+    {
+      "endpoint": "Evidence page",
+      "path": "/evidence/control/1",
+      "available": true,
+      "bytes": 3996,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 11.9,
+      "p50_ms": 11.6,
+      "p95_ms": 15.2,
+      "p99_ms": 16.6,
+      "max_ms": 17.9
+    },
+    {
+      "endpoint": "Remediation Tracker",
+      "path": "/remediation/",
+      "available": true,
+      "bytes": 20428,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 14.4,
+      "p50_ms": 14.0,
+      "p95_ms": 18.2,
+      "p99_ms": 20.1,
+      "max_ms": 21.3
+    },
+    {
+      "endpoint": "Domain summary export",
+      "path": "/reports/domain-summary.csv",
+      "available": true,
+      "bytes": 730,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 15.7,
+      "p50_ms": 14.9,
+      "p95_ms": 20.6,
+      "p99_ms": 23.8,
+      "max_ms": 31.1
+    },
+    {
+      "endpoint": "Control extract export",
+      "path": "/reports/controls.csv",
+      "available": true,
+      "bytes": 8777,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 15.7,
+      "p50_ms": 15.4,
+      "p95_ms": 19.6,
+      "p99_ms": 20.7,
+      "max_ms": 21.5
+    },
+    {
+      "endpoint": "Summary API",
+      "path": "/api/summary",
+      "available": true,
+      "bytes": 1483,
+      "codes": {
+        "200": 200
+      },
+      "n": 200,
+      "mean_ms": 15.5,
+      "p50_ms": 15.1,
+      "p95_ms": 20.0,
+      "p99_ms": 22.3,
+      "max_ms": 24.9
+    }
+  ],
+  "throughput_runs": [
+    [
+      {
+        "users": 1,
+        "requests": 400,
+        "seconds": 6.86,
+        "throughput_rps": 58.3,
+        "error_rate_pct": 0.0,
+        "mean_ms": 17.2,
+        "p50_ms": 16.7,
+        "p95_ms": 21.6,
+        "p99_ms": 23.3,
+        "max_ms": 24.7
+      },
+      {
+        "users": 5,
+        "requests": 400,
+        "seconds": 3.78,
+        "throughput_rps": 105.8,
+        "error_rate_pct": 0.0,
+        "mean_ms": 46.6,
+        "p50_ms": 46.4,
+        "p95_ms": 62.7,
+        "p99_ms": 71.2,
+        "max_ms": 78.7
+      },
+      {
+        "users": 10,
+        "requests": 400,
+        "seconds": 3.64,
+        "throughput_rps": 110.0,
+        "error_rate_pct": 0.0,
+        "mean_ms": 89.0,
+        "p50_ms": 87.9,
+        "p95_ms": 127.4,
+        "p99_ms": 144.5,
+        "max_ms": 174.1
+      },
+      {
+        "users": 20,
+        "requests": 400,
+        "seconds": 3.73,
+        "throughput_rps": 107.3,
+        "error_rate_pct": 0.0,
+        "mean_ms": 180.7,
+        "p50_ms": 181.2,
+        "p95_ms": 224.8,
+        "p99_ms": 265.5,
+        "max_ms": 317.7
+      }
+    ],
+    [
+      {
+        "users": 1,
+        "requests": 400,
+        "seconds": 6.53,
+        "throughput_rps": 61.3,
+        "error_rate_pct": 0.0,
+        "mean_ms": 16.3,
+        "p50_ms": 15.7,
+        "p95_ms": 20.8,
+        "p99_ms": 23.8,
+        "max_ms": 27.8
+      },
+      {
+        "users": 5,
+        "requests": 400,
+        "seconds": 4.01,
+        "throughput_rps": 99.8,
+        "error_rate_pct": 0.0,
+        "mean_ms": 48.9,
+        "p50_ms": 48.6,
+        "p95_ms": 67.7,
+        "p99_ms": 74.1,
+        "max_ms": 94.5
+      },
+      {
+        "users": 10,
+        "requests": 400,
+        "seconds": 4.26,
+        "throughput_rps": 94.0,
+        "error_rate_pct": 0.0,
+        "mean_ms": 104.9,
+        "p50_ms": 104.9,
+        "p95_ms": 146.2,
+        "p99_ms": 159.3,
+        "max_ms": 166.5
+      },
+      {
+        "users": 20,
+        "requests": 400,
+        "seconds": 3.94,
+        "throughput_rps": 101.5,
+        "error_rate_pct": 0.0,
+        "mean_ms": 192.3,
+        "p50_ms": 192.0,
+        "p95_ms": 243.5,
+        "p99_ms": 271.2,
+        "max_ms": 280.2
+      }
+    ],
+    [
+      {
+        "users": 1,
+        "requests": 400,
+        "seconds": 7.13,
+        "throughput_rps": 56.1,
+        "error_rate_pct": 0.0,
+        "mean_ms": 17.8,
+        "p50_ms": 17.3,
+        "p95_ms": 22.6,
+        "p99_ms": 23.8,
+        "max_ms": 27.8
+      },
+      {
+        "users": 5,
+        "requests": 400,
+        "seconds": 4.37,
+        "throughput_rps": 91.5,
+        "error_rate_pct": 0.0,
+        "mean_ms": 54.0,
+        "p50_ms": 53.7,
+        "p95_ms": 78.0,
+        "p99_ms": 88.5,
+        "max_ms": 98.4
+      },
+      {
+        "users": 10,
+        "requests": 400,
+        "seconds": 3.89,
+        "throughput_rps": 102.7,
+        "error_rate_pct": 0.0,
+        "mean_ms": 94.8,
+        "p50_ms": 93.0,
+        "p95_ms": 125.6,
+        "p99_ms": 152.6,
+        "max_ms": 168.2
+      },
+      {
+        "users": 20,
+        "requests": 400,
+        "seconds": 4.0,
+        "throughput_rps": 100.1,
+        "error_rate_pct": 0.0,
+        "mean_ms": 194.8,
+        "p50_ms": 193.2,
+        "p95_ms": 260.5,
+        "p99_ms": 284.1,
+        "max_ms": 323.8
+      }
+    ]
+  ],
+  "throughput": [
+    {
+      "users": 1,
+      "runs": 3,
+      "requests": 400,
+      "throughput_rps": 58.3,
+      "p50_ms": 16.7,
+      "p95_ms": 21.6,
+      "error_rate_pct": 0.0,
+      "throughput_range": [
+        56.1,
+        61.3
+      ]
+    },
+    {
+      "users": 5,
+      "runs": 3,
+      "requests": 400,
+      "throughput_rps": 99.8,
+      "p50_ms": 48.6,
+      "p95_ms": 67.7,
+      "error_rate_pct": 0.0,
+      "throughput_range": [
+        91.5,
+        105.8
+      ]
+    },
+    {
+      "users": 10,
+      "runs": 3,
+      "requests": 400,
+      "throughput_rps": 102.7,
+      "p50_ms": 93.0,
+      "p95_ms": 127.4,
+      "error_rate_pct": 0.0,
+      "throughput_range": [
+        94.0,
+        110.0
+      ]
+    },
+    {
+      "users": 20,
+      "runs": 3,
+      "requests": 400,
+      "throughput_rps": 101.5,
+      "p50_ms": 192.0,
+      "p95_ms": 243.5,
+      "error_rate_pct": 0.0,
+      "throughput_range": [
+        100.1,
+        107.3
+      ]
+    }
+  ],
+  "memory": {
+    "idle_mb": 38.3,
+    "after_latency_mb": 48.1,
+    "peak_under_load_mb": 112.3,
+    "after_load_mb": 48.3
+  },
+  "workflows": {
+    "workflows": [
+      {
+        "passed": true,
+        "steps": [
+          "Custodian opens the control's evidence page",
+          "Custodian uploads the document",
+          "Auditor opens the evidence page",
+          "Auditor approves the document",
+          "Owner opens the control",
+          "Owner records the control as Implemented"
+        ],
+        "control": "1-3-4",
+        "detail": "1-3-4: Partially Implemented -> Implemented; Implemented controls 8 -> 9",
+        "id": "W1",
+        "title": "Evidence filed, independently approved, control recorded as Implemented",
+        "interactions": 6
+      },
+      {
+        "passed": true,
+        "steps": [
+          "Auditor opens the new-finding form",
+          "Auditor raises the finding",
+          "Owner opens the tracker",
+          "Owner starts the work",
+          "Owner requests closure with a note",
+          "Auditor opens the tracker",
+          "Auditor verifies the closure"
+        ],
+        "fr7_independent_verification": true,
+        "owner_self_verification_blocked": true,
+        "self_verify_http": 403,
+        "detail": "item 20: Open -> In Progress -> Pending Verification -> Closed",
+        "id": "W2",
+        "title": "Finding raised, worked, closure verified by someone other than the owner",
+        "interactions": 7
+      },
+      {
+        "passed": true,
+        "steps": [
+          "Manager opens the dashboard",
+          "Manager downloads the domain summary",
+          "Manager downloads the control extract"
+        ],
+        "detail": "domain summary 9 lines; control extract 68 rows for 68 tracked controls; boundary statement present: True",
+        "id": "W3",
+        "title": "Compliance summary exported for an audit request",
+        "interactions": 3
+      },
+      {
+        "passed": true,
+        "steps": [
+          "Owner opens the control",
+          "Owner tries to record Implemented"
+        ],
+        "detail": "1-10-5 stayed Not Implemented; message: A control cannot be marked Implemented until supporting evidence has been approved by a reviewer.",
+        "id": "W4",
+        "title": "Implemented refused while no approved evidence exists",
+        "interactions": 2
+      },
+      {
+        "passed": true,
+        "steps": [
+          "ControlOwner01 opens a control owned by ControlOwner02",
+          "ControlOwner01 submits a status change"
+        ],
+        "http": 403,
+        "detail": "1-4-1 owned by ControlOwner02: Not Implemented -> Not Implemented (refused)",
+        "id": "W5",
+        "title": "Owner refused a change to a control assigned to someone else",
+        "interactions": 2
+      }
+    ],
+    "passed": 5,
+    "total": 5
+  },
+  "integrity": {
+    "pairs": 15,
+    "requests": 30,
+    "http_codes": {
+      "302": 30
+    },
+    "server_errors": 0,
+    "records_created": 30,
+    "digest_mismatches": 0,
+    "orphan_files": 0
+  },
+  "scale": [
+    {
+      "remediation_items": 13,
+      "dashboard_p50_ms": 14.9,
+      "dashboard_p95_ms": 18.7,
+      "dashboard_kb": 7.4,
+      "tracker_p50_ms": 11.9,
+      "tracker_p95_ms": 12.5,
+      "tracker_kb": 20.7,
+      "rss_mb": 45.8
+    },
+    {
+      "remediation_items": 1000,
+      "dashboard_p50_ms": 20.0,
+      "dashboard_p95_ms": 24.3,
+      "dashboard_kb": 7.4,
+      "tracker_p50_ms": 31.1,
+      "tracker_p95_ms": 47.1,
+      "tracker_kb": 39.4,
+      "rss_mb": 52.6
+    },
+    {
+      "remediation_items": 5000,
+      "dashboard_p50_ms": 37.3,
+      "dashboard_p95_ms": 50.6,
+      "dashboard_kb": 7.4,
+      "tracker_p50_ms": 101.6,
+      "tracker_p95_ms": 126.5,
+      "tracker_kb": 33.2,
+      "rss_mb": 91.3
+    },
+    {
+      "remediation_items": 20000,
+      "dashboard_p50_ms": 116.8,
+      "dashboard_p95_ms": 156.1,
+      "dashboard_kb": 7.4,
+      "tracker_p50_ms": 399.7,
+      "tracker_p95_ms": 446.5,
+      "tracker_kb": 33.2,
+      "rss_mb": 234.9
+    }
+  ]
+}

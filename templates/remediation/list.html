@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Remediation Tracker &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<h1>Remediation Tracker</h1>
+<p class="sub">Open work is ordered by derived state, then by priority, then by due date.
+  Overdue is calculated on read from the due date, never stored as a flag.</p>
+
+<div class="grid grid-5">
+  <div class="stat"><div class="n">{{ counts.get('Open', 0) }}</div><div class="l">Open</div></div>
+  <div class="stat"><div class="n">{{ counts.get('In Progress', 0) }}</div><div class="l">In progress</div></div>
+  <div class="stat"><div class="n">{{ counts.get('Pending Verification', 0) }}</div><div class="l">Awaiting verification</div></div>
+  <div class="stat"><div class="n">{{ overdue }}</div><div class="l">Overdue</div></div>
+  <div class="stat"><div class="n">{{ counts.get('Closed', 0) }}</div><div class="l">Closed</div></div>
+</div>
+
+<p class="filterbar">
+  <a href="{{ url_for('remediation.index') }}" {% if not filter_status and not mine %}class="on"{% endif %}>All</a>
+  <a href="{{ url_for('remediation.index', status='Open') }}" {% if filter_status == 'Open' %}class="on"{% endif %}>Open</a>
+  <a href="{{ url_for('remediation.index', status='In Progress') }}" {% if filter_status == 'In Progress' %}class="on"{% endif %}>In progress</a>
+  <a href="{{ url_for('remediation.index', status='Pending Verification') }}" {% if filter_status == 'Pending Verification' %}class="on"{% endif %}>Awaiting verification</a>
+  <a href="{{ url_for('remediation.index', status='Closed') }}" {% if filter_status == 'Closed' %}class="on"{% endif %}>Closed</a>
+  <a href="{{ url_for('remediation.index', mine='1') }}" {% if mine %}class="on"{% endif %}>Assigned to me</a>
+  {% if can('remediation.edit') %}
+    <a class="btn small" href="{{ url_for('remediation.new') }}">Raise a finding</a>
+  {% endif %}
+</p>
+
+<div class="card">
+  <table>
+    <thead><tr><th>#</th><th>Control</th><th>Finding</th><th>Owner</th>
+      <th>Priority</th><th>Due</th><th>State</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+    {% for i in items %}
+      {% set is_owner = current_user.user_id == i.owner_user_id %}
+      {% set may_work = is_owner or current_user.role == 'GRC Administrator' %}
+      <tr>
+        <td class="muted">{{ i.remediation_id }}</td>
+        <td><a href="{{ url_for('controls.detail', control_id=i.control_id) }}">{{ i.ecc_reference }}</a></td>
+        <td>{{ i.finding }}
+          {% if i.status == 'Pending Verification' %}
+            <div class="muted">Closure requested by {{ i.requested_by_name }}: {{ i.closure_note }}</div>
+          {% elif i.status == 'Closed' %}
+            <div class="muted">Closed: {{ i.closure_note }}</div>
+            <div class="muted">Verified by {{ i.verified_by_name }}{% if i.verification_note %}: {{ i.verification_note }}{% endif %}</div>
+          {% elif i.verification_note %}
+            <div class="muted danger">Returned by the verifier: {{ i.verification_note }}</div>
+          {% endif %}</td>
+        <td class="muted">{{ i.owner_name }}</td>
+        <td><span class="pill p-{{ i.priority | lower }}">{{ i.priority }}</span></td>
+        <td class="muted">{{ i.due_date.strftime('%d %b %Y') }}</td>
+        <td>
+          {% if i.derived_state == 'overdue' %}
+            <b class="danger">Overdue by {{ i.derived_days }} d</b>
+          {% elif i.derived_state == 'due_soon' %}
+            Due in {{ i.derived_days }} d
+          {% elif i.derived_state == 'closed' %}
+            <span class="muted">&ndash;</span>
+          {% else %}
+            <span class="muted">{{ i.derived_days }} d remaining</span>
+          {% endif %}
+        </td>
+        <td>{{ i.status }}</td>
+        <td class="actions">
+          {% if can('remediation.edit') and may_work and i.status == 'Open' %}
+            <form method="post" action="{{ url_for('remediation.advance', remediation_id=i.remediation_id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="back" value="{{ back }}">
+              <button type="submit" name="status" value="In Progress">Start work</button>
+            </form>
+          {% endif %}
+          {% if can('remediation.edit') and may_work and i.status in ('Open', 'In Progress') %}
+            <details>
+              <summary>Request closure</summary>
+              <form method="post" action="{{ url_for('remediation.request_closure', remediation_id=i.remediation_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="back" value="{{ back }}">
+                <textarea name="note" rows="3" maxlength="1000" minlength="10" required
+                  placeholder="What was done, and where the evidence is filed"></textarea>
+                <button type="submit">Submit for verification</button>
+              </form>
+            </details>
+          {% endif %}
+          {% if i.status == 'Pending Verification' %}
+            {% if can('remediation.verify') and not is_owner and current_user.user_id != i.closure_requested_by %}
+            <details>
+              <summary>Verify closure</summary>
+              <form method="post" action="{{ url_for('remediation.verify', remediation_id=i.remediation_id) }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="back" value="{{ back }}">
+                <textarea name="note" rows="3" maxlength="1000"
+                  placeholder="Verification note (required to return the item)"></textarea>
+                <button type="submit" name="decision" value="approve">Verify and close</button>
+                <button type="submit" name="decision" value="return" class="secondary">Return to owner</button>
+              </form>
+            </details>
+            {% else %}
+            <span class="muted">Awaiting independent verification</span>
+            {% endif %}
+          {% endif %}
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="9" class="muted">No remediation items match this view.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+
+  {% if pages > 1 %}
+  <div class="pager">
+    {% set args = {'status': filter_status} if filter_status else {} %}
+    {% if mine %}{% set _ = args.update({'mine': '1'}) %}{% endif %}
+    {% if page > 1 %}<a href="{{ url_for('remediation.index', page=page - 1, **args) }}">&larr; Previous</a>{% endif %}
+    <span class="cur">Page {{ page }} of {{ pages }}</span>
+    <span class="muted">{{ total }} items</span>
+    {% if page < pages %}<a href="{{ url_for('remediation.index', page=page + 1, **args) }}">Next &rarr;</a>{% endif %}
+  </div>
+  {% endif %}
+
+  <p class="muted">Closing an item takes two people. The owner, or a GRC Administrator acting
+    for an owner who has left, records what was done and requests closure; someone else
+    who holds the verification permission, normally an Internal Auditor, verifies it or
+    returns it with a reason. The database refuses a closure made by the item's owner or
+    by the person who requested it.</p>
+</div>
+{% endblock %}

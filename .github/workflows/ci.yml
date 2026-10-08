@@ -1,0 +1,121 @@
+name: CI
+
+# Continuous integration only. Unit 4 committed this project to CI without
+# continuous deployment: the prototype has no production environment, and an
+# automatic release would conflict with the reviewer-approval principle in the
+# Unit 3 design. Unit 5 implemented that commitment.
+#
+# Unit 6 changes, each from a finding of the Unit 6 evaluation:
+#   - tools are installed from requirements-dev.txt at pinned versions, and the
+#     lint rule set is declared in ruff.toml, because an unpinned ruff changed
+#     the lint verdict without any change to the code;
+#   - the SQL build order is read from database/load_order.txt, the one list
+#     the evaluation script and the deployment guide also use;
+#   - the production entry point (serve.py, waitress) is started and probed,
+#     and is shown to refuse a production start while seeded accounts remain;
+#   - the dependency audit now fails the build. It reported two advisories
+#     while it was allowed to pass, and nothing acted on them until Unit 6.
+
+on:
+  push:
+    branches: [main, develop, 'feature/**', 'fix/**']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: compliancetrack
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready --health-interval 10s
+          --health-timeout 5s --health-retries 5
+
+    env:
+      DB_HOST: localhost
+      DB_PORT: '5432'
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: compliancetrack
+      PGPASSWORD: postgres
+      FLASK_SECRET_KEY: ci-only-not-a-secret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      # The unit tests need no database. They run first so a logic error is
+      # reported in seconds rather than after the schema has been loaded.
+      - name: Unit tests
+        run: python -m pytest -m "not integration"
+
+      - name: Load the schema and seed data
+        run: |
+          grep -v '^\s*#' database/load_order.txt | sed '/^\s*$/d' | while read -r f; do
+            psql -h localhost -U postgres -d compliancetrack -v ON_ERROR_STOP=1 -f "database/$f"
+          done
+          python scripts/seed_evidence_demo.py
+          python scripts/reconcile_evidence_gate.py
+
+      - name: Integration tests
+        run: python -m pytest -m integration
+
+      # The same application, served the way a deployment would serve it.
+      - name: Serve smoke test
+        env:
+          APP_ENV: demo
+          APP_PORT: '8080'
+        run: |
+          export FLASK_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+          python serve.py > serve.log 2>&1 &
+          server_pid=$!
+          for i in $(seq 1 30); do
+            curl -fsS -o /dev/null http://127.0.0.1:8080/login && break
+            sleep 1
+          done
+          curl -fsS -o /dev/null -w "sign-in page through waitress: HTTP %{http_code}\n" \
+            http://127.0.0.1:8080/login
+          cat serve.log
+          kill "$server_pid"
+
+      - name: Production start is refused while seeded accounts remain
+        env:
+          APP_ENV: production
+          APP_PORT: '8081'
+        run: |
+          export FLASK_SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')"
+          set +e
+          timeout 20 python serve.py
+          code=$?
+          set -e
+          echo "serve.py exit code: $code (1 means it refused, as it must)"
+          test "$code" -eq 1
+
+      # Evidence is user-supplied file content, so a vulnerable parsing
+      # dependency is a live risk rather than a theoretical one.
+      - name: Dependency audit
+        run: pip-audit --requirement requirements.txt
+
+      - name: Check that no secret was committed
+        run: |
+          if git ls-files | grep -qx '.env'; then
+            echo "A .env file is tracked. Secrets must never be committed."
+            exit 1
+          fi

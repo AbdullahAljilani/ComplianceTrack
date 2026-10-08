@@ -1,0 +1,11 @@
+# The order in which the SQL files under database/ are loaded into an empty
+# PostgreSQL database. One list, read by the CI workflow and by
+# scripts/evaluate_system.py and copied into docs/DEPLOYMENT.md, so the build
+# order is written down once instead of in several places that can drift apart.
+schema.sql
+migrations/001_unit4_scope_tier.sql
+seed_reference_data.sql
+seed_ecc_controls.sql
+migrations/002_unit5_core_logic.sql
+seed_unit5_workflow.sql
+migrations/003_unit6_closure_verification.sql

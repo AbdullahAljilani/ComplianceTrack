@@ -1,0 +1,9 @@
+# Tools for testing, linting, auditing and evaluating. Not needed to run the
+# application. Pinned, so a CI run in a month gives the same verdict as today.
+-r requirements.txt
+pytest==9.1.1
+coverage==7.16.2
+ruff==0.16.10
+pip-audit==2.10.1
+requests==2.34.2
+psutil==7.2.2

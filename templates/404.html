@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Not found &middot; ComplianceTrack{% endblock %}
+{% block content %}
+<h1>Not found</h1>
+<p class="sub">That record does not exist.</p>
+<p><a class="btn ghost" href="{{ url_for('controls.index') }}">Back to the Control Register</a></p>
+{% endblock %}
